@@ -69,5 +69,8 @@ gssh 'sudo update-alternatives --set c++ /usr/bin/clang++'
 announce 'Build Fmt from source'
 gssh 'git clone https://github.com/fmtlib/fmt.git; mkdir -p fmt/_build && cd fmt/_build && cmake .. && make -j$(nproc) && sudo make install'
 
-announce 'Configure & Build Glow'
+announce 'Configure & Build Glow in Debug Mode'
 gssh 'mkdir -p build_Debug && cd build_Debug && cmake -G Ninja -DCMAKE_BUILD_TYPE=Debug ../glow && ninja all'
+
+announce 'Configure & Build Glow in Release Mode'
+gssh 'mkdir -p build_Release && cd build_Release && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ../glow && ninja all'

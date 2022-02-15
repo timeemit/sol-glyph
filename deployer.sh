@@ -61,10 +61,10 @@ announce 'Clang++ version 50'
 gssh 'sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/lib/llvm-8/bin/clang++ 50'
 
 announce 'Specify Clang binary'
-gssh 'sudo update-alternatives --config cc'
+gssh 'sudo update-alternatives --set cc /usr/bin/clang'
 
 announce 'Specify Clang++ binary'
-gssh 'sudo update-alternatives --config c++'
+gssh 'sudo update-alternatives --set c++ /usr/bin/clang++'
 
 announce 'Build Fmt from source'
 gssh 'git clone https://github.com/fmtlib/fmt.git; mkdir -p fmt/_build && cd fmt/_build && cmake .. && make -j$(nproc) && sudo make install'

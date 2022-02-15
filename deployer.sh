@@ -1,11 +1,11 @@
 INSTANCE='builder-1'
 
 function announce() {
-  echo '==='
-  echo "= $1"
+  echo '=='
+  echo "-  $1"
 }
 function e() {
-  echo '==='
+  echo '=='
   echo "Running \`$@\`"
   eval $@
   echo

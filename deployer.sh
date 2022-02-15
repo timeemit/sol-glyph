@@ -74,3 +74,6 @@ gssh 'mkdir -p build_Debug && cd build_Debug && cmake -G Ninja -DCMAKE_BUILD_TYP
 
 announce 'Configure & Build Glow in Release Mode'
 gssh 'mkdir -p build_Release && cd build_Release && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release ../glow && ninja all'
+
+announce 'Configure & Build Glow in Release Mode with Bundles'
+gssh 'mkdir -p build_Release && cd build_Release && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DGLOW_WITH_BUNDLES=ON ../glow && ninja all'

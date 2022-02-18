@@ -87,3 +87,10 @@ gssh './build_Release/bin/model-compiler -backend=CPU -model=/home/liam/DCGAN-Ge
 announce 'Compiling an randomly generated model with quantization'
 gssh './build_Release/bin/model-profiler -model=/home/liam/DCGAN-Generator.onnx -dump-profile=profile.yaml -input-dataset=0,rawtxt,dir,/home/liam/rand -relocation-model=pic -verbose'
 gssh './build_Release/bin/model-compiler -backend=CPU -model=/home/liam/DCGAN-Generator.onnx -load-profile=profile.yaml -emit-bundle=./bundles-DCGAN-Generator-Random-quantized -target=bpf -mcpu=generic -verbose -relocation-model=pic'
+
+announce 'Compiling an initialized model with just one input variable'
+gssh './build_Release/bin/model-compiler -backend=CPU -model=/home/liam/DCGAN-init.onnx -emit-bundle=./bundles-DCGAN-init -target=bpf -mcpu=generic -relocation-model=pic -bundle-api=dynamic'
+
+announce 'Compiling an initialized model with just one input variable with quantization'
+gssh './build_Release/bin/model-profiler -model=/home/liam/DCGAN-init.onnx -dump-profile=profile-init-quantized.yaml -input-dataset=0,rawtxt,dir,/home/liam/rand -relocation-model=pic -verbose'
+gssh './build_Release/bin/model-compiler -backend=CPU -model=/home/liam/DCGAN-init.onnx -load-profile=profile.yaml -emit-bundle=./bundles-DCGAN-init-quantized -target=bpf -mcpu=generic -verbose -relocation-model=pic -bundle-api=dynamic'

@@ -44,25 +44,14 @@ e gcloud compute instances create $INSTANCE \
 announce 'Housekeeping'
 gssh 'sudo apt-get update && sudo apt-get dist-upgrade'
 
-announce 'Install correct kernel headers'
-gssh 'sudo apt-get install linux-headers-$(uname -r)'
-
-announce 'Download PIN'
-gssh 'wget https://developer.download.nvidia.com/compute/cuda/repos/ubuntu1804/x86_64/cuda-ubuntu1804.pin && sudo mv cuda-ubuntu1804.pin /etc/apt/preferences.d/cuda-repository-pin-600'
-
-announce 'Download CUDA'
-gssh 'wget https://developer.download.nvidia.com/compute/cuda/11.6.0/local_installers/cuda-repo-ubuntu1804-11-6-local_11.6.0-510.39.01-1_amd64.deb'
+announce 'Install Python & Pip'
+gssh 'sudo apt-get install --yes python3 python3-pip python3-dev python3-setuptools && pip3 install --upgrade pip'
 
 announce 'Install CUDA'
-gssh 'sudo dpkg -i cuda-repo-ubuntu1804-11-6-local_11.6.0-510.39.01-1_amd64.deb && sudo apt-key add /var/cuda-repo-ubuntu1804-11-6-local/7fa2af80.pub && sudo apt-get update && sudo apt-get -y install cuda'
-gssh 'echo "export PATH=/usr/local/cuda-11.6/bin${PATH:+:${PATH}}" >> ~/.profile && export LD_LIBRARY_PATH=/usr/local/cuda-11.6/lib64 ${LD_LIBRARY_PATH:+:${LD_LIBRARY_PATH}} >> ~/.profile'
-gssh '/usr/bin/nvidia-persistenced --verbose'
+gssh 'curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py && sudo python3 install_gpu_driver.py'
 
 announce 'Downloading Pytorch Examples'
 gssh 'git clone https://github.com/pytorch/tutorials.git'
-
-announce 'Install Python & Pip'
-gssh 'sudo apt-get install --yes python3 python3-pip python3-dev python3-setuptools && pip install --upgrade pip'
 
 announce 'Install Cython'
 gssh 'pip3 install cython'
@@ -74,4 +63,5 @@ announce 'Install Python requirements'
 gssh 'pip3 install -r tutorials/requirements.txt'
 
 announce 'Download dataset'
-gssh 'cd tutorials && make downloads'
+gssh 'make -C ./tutorials download'
+gssh 'mkdir -p ./tutorials/data unzip ./tutorials/_data/img_align_celeba.zip -d ./tutorials/data/celeba/'

@@ -68,11 +68,10 @@ announce 'Install Cython'
 gssh 'pip3 install cython'
 
 announce 'Install Pillow dependencies'
-gssh 'sudo apt-get install --yes libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk libharfbuzz-dev libfribidi-dev libxcb1-dev'
+gssh 'sudo apt-get install --yes libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl8.6-dev tk8.6-dev python3-tk libharfbuzz-dev libfribidi-dev libxcb1-dev zip'
 
 announce 'Install Python requirements'
 gssh 'pip3 install -r tutorials/requirements.txt'
 
-announce 'Build documentation'
-gssh 'sudo apt-get install --yes zip'
-gssh 'cd tutorials && make docs'
+announce 'Download dataset'
+gssh 'cd tutorials && make downloads'

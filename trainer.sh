@@ -42,7 +42,7 @@ e gcloud compute instances create $INSTANCE \
   sleep 30
 
 announce 'Housekeeping'
-gssh 'sudo apt-get update && sudo apt-get dist-upgrade'
+gssh 'sudo apt-get update --yes && sudo apt-get dist-upgrade --yes'
 
 announce 'Install Python & Pip'
 gssh 'sudo apt-get install --yes python3 python3-pip python3-dev python3-setuptools && pip3 install --upgrade pip'
@@ -51,7 +51,7 @@ announce 'Install CUDA'
 gssh 'curl https://raw.githubusercontent.com/GoogleCloudPlatform/compute-gpu-installation/main/linux/install_gpu_driver.py --output install_gpu_driver.py && sudo python3 install_gpu_driver.py'
 
 announce 'Downloading Pytorch Examples'
-gssh 'git clone https://github.com/pytorch/tutorials.git'
+gssh 'git clone git@github.com:timeemit/tutorials.git'
 
 announce 'Install Cython'
 gssh 'pip3 install cython'

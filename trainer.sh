@@ -63,6 +63,11 @@ gssh 'sudo apt-get install --yes libtiff5-dev libjpeg8-dev libopenjp2-7-dev zlib
 announce 'Install Python requirements'
 gssh 'pip3 install -r tutorials/requirements.txt'
 
-announce 'Download dataset'
+announce 'Download celeba dataset'
 gssh 'make -C ./tutorials download'
 gssh 'mkdir -p ./tutorials/data unzip ./tutorials/_data/img_align_celeba.zip -d ./tutorials/data/celeba/'
+
+announce 'Upload emojis dataset'
+e gcloud compute scp --zone $ZONE --project solana-paint ./emojis.zip $INSTANCE:~/tutorials/
+gssh 'unzip ~/tutorials/emojis.zip -d ~/tutorials/data/'
+gssh 'rm -r ~/tutorials/data/image/{DoCoMo,JoyPixels,KDDI,SoftBank}'

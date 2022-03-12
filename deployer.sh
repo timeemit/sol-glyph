@@ -46,7 +46,7 @@ announce 'Installing rust'
 gssh 'curl --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sh -s -- -y' 'rustup --version'
 
 announce 'Installing Solana'
-gssh 'curl -sSfL https://release.solana.com/v1.9.6/install | sh' 'solana --version'
+gssh 'curl -sSfL https://release.solana.com/v1.9.9/install | sh' 'solana --version'
 
 announce 'Downloading Glow repository'
 gssh 'git clone https://github.com/pytorch/glow.git && cd glow && git submodule update --init --recursive'

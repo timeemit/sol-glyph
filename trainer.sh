@@ -1,4 +1,5 @@
-INSTANCE='trainer-1'
+INSTANCE='trainer-2'
+ZONE='us-central1-c'
 
 function announce() {
   echo '=='
@@ -16,7 +17,7 @@ function gssh() {
   E=$1
   CHECK="$(check "$2")"
   [ -n "$CHECK" ] && E="$CHECK $E"
-  COMMAND="gcloud compute ssh --zone us-central1-a $INSTANCE --project solana-paint -- -C 'bash -lc \"$E\"'"
+  COMMAND="gcloud compute ssh --zone $ZONE $INSTANCE --project solana-paint -- -C 'bash -lc \"$E\"'"
   e $COMMAND
 }
 
@@ -27,14 +28,14 @@ function check() {
 announce 'Creating trainer'
 e gcloud compute instances create $INSTANCE \
   --project=solana-paint \
-  --zone=us-central1-a \
+  --zone=$ZONE \
   --machine-type=n1-standard-2 \
   --network-interface=network-tier=PREMIUM,subnet=default \
   --maintenance-policy=TERMINATE \
   --service-account=914975206125-compute@developer.gserviceaccount.com \
   --scopes=https://www.googleapis.com/auth/devstorage.read_only,https://www.googleapis.com/auth/logging.write,https://www.googleapis.com/auth/monitoring.write,https://www.googleapis.com/auth/servicecontrol,https://www.googleapis.com/auth/service.management.readonly,https://www.googleapis.com/auth/trace.append \
   --accelerator=count=1,type=nvidia-tesla-t4 \
-  --create-disk=auto-delete=yes,boot=yes,device-name=instance-1,image=projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20220213,mode=rw,size=200,type=projects/solana-paint/zones/us-central1-a/diskTypes/pd-balanced \
+  --create-disk=auto-delete=yes,boot=yes,device-name=$INSTANCE,image=projects/ubuntu-os-cloud/global/images/ubuntu-1804-bionic-v20220213,mode=rw,size=200,type=projects/solana-paint/zones/$ZONE/diskTypes/pd-balanced \
   --no-shielded-secure-boot \
   --shielded-vtpm \
   --shielded-integrity-monitoring \

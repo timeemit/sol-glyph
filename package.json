@@ -3,13 +3,11 @@
   "version": "1.0.0",
   "description": "Stop templating your NFT collections.  Generate them from a trained machine learning smart contract.",
   "main": "src/client/index.js",
-  "type": "module",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-		"build": "webpack --mode production",
+    "build": "webpack --mode production",
     "watch": "webpack --watch --mode development",
-		"start": "node src/webserver/index.js"
-
+    "start": "ts-node src/webserver/index.js"
   },
   "repository": {
     "type": "git",
@@ -31,6 +29,11 @@
     "react": "^17.0.2"
   },
   "devDependencies": {
+    "@types/express": "^4.17.13",
+    "@types/node": "^17.0.21",
+    "@types/webpack": "^5.28.0",
+    "ts-node": "^10.7.0",
+    "typescript": "^4.6.2",
     "webpack": "^5.70.0",
     "webpack-cli": "^4.9.2"
   }

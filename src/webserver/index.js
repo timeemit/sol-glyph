@@ -1,11 +1,14 @@
-const express = require('express')
-const app = express()
-const port = process.env.PORT
+import express from 'express';
+import path from 'path';
+import {fileURLToPath} from 'url';
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.static(path.resolve(__dirname, 'dist')));
 
 app.listen(port, () => {
   console.log(`Example app listening on port ${port}`)
-})
+});

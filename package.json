@@ -4,7 +4,9 @@
   "description": "Stop templating your NFT collections.  Generate them from a trained machine learning smart contract.",
   "main": "src/client/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+		"build": "webpack"
+
   },
   "repository": {
     "type": "git",
@@ -22,6 +24,11 @@
     "@solana/wallet-adapter-react-ui": "^0.9.5",
     "@solana/wallet-adapter-wallets": "^0.15.5",
     "@solana/web3.js": "^1.36.0",
+    "express": "^4.17.3",
     "react": "^17.0.2"
+  },
+  "devDependencies": {
+    "webpack": "^5.70.0",
+    "webpack-cli": "^4.9.2"
   }
 }

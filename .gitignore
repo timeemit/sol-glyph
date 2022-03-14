@@ -1,3 +1,5 @@
 dist
 *.png
 *.onnx
+github.pat
+node_modules

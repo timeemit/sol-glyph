@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/timeemit/solana-glyph.git"
+    "url": "git+https://github.com/timeemit/sol-glyph.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/timeemit/solana-glyph/issues"
+    "url": "https://github.com/timeemit/sol-glyph/issues"
   },
-  "homepage": "https://github.com/timeemit/solana-glyph#readme",
+  "homepage": "https://github.com/timeemit/sol-glyph#readme",
   "dependencies": {
     "@solana/web3.js": "^1.36.0",
     "express": "^4.17.3",

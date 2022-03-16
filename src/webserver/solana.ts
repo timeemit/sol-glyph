@@ -35,7 +35,7 @@ let payer: Keypair;
 /*
  * RPC url is read from an environment variable
  */
-const rpcUrl = await getRpcUrl();
+const rpcUrl = process.env.RPC_URL;
 
 
 /*
@@ -63,7 +63,8 @@ const dcganResultStruct = seq(f32(), 192);
  * Establish a connection to the cluster
  */
 export async function establishConnection(): Promise<void> {
-  connection = new Connection(rpcUrl, 'confirmed');
+  let fallbackRpcUrl = rpcUrl || await getRpcUrl();
+  connection = new Connection(fallbackRpcUrl, 'confirmed');
   const version = await connection.getVersion();
   console.log('Connection to cluster established:', rpcUrl, version);
 }

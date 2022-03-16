@@ -34,9 +34,9 @@ export async function getRpcUrl(): Promise<string> {
     return config.json_rpc_url;
   } catch (err) {
     console.warn(
-      'Failed to read RPC url from CLI config file, falling back to process.env.RPC_URL',
+      'Failed to read RPC url from CLI config file, falling back to localhost',
     );
-    return process.env.RPC_URL || 'http://127.0.0.1:8899';
+    return  'http://127.0.0.1:8899';
   }
 }
 

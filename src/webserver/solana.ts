@@ -98,7 +98,6 @@ export async function establishPayer(): Promise<void> {
 }
 
 async function createAccount(programId: PublicKey): Promise<PublicKey> {
-  console.log('Getting account info');
   const seed = uuidv4().slice(0, 8);
   const programAccountPubkey = await PublicKey.createWithSeed(
     payer.publicKey,

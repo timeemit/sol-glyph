@@ -29,7 +29,7 @@
       <div class="basis-3/5">Images "Between" A &amp; B</div>
       <div class="basis-1/5">A Randomly Generated Image (B)</div>
     </div>
-    <h2 class="text-xl text-center">You're Looking at Images Generated<br />Entirely on the Solana Blockchain<br />Using Machine Learning</h2>
+    <h2 class="text-xl text-center">You're Looking at Images Generated<br />Entirely on a Solana Blockchain<br />Using a Trained Machine Learning Model</h2>
     <script>
       // Standard Normal variate using Box-Muller transform.
       function randn() {
@@ -43,6 +43,20 @@
         return Array(size).fill(0).map(randn);
       }
 
+      function range(data) {
+        min = 0;
+        max = 0;
+        data.forEach((datum) => {
+          min = Math.min(datum, min);
+          max = Math.max(datum, max);
+        });
+        return {min, max};
+      }
+
+      function rescale(srcMin, srcMax, dstMin, dstMax, val) {
+        return (((val - srcMin) / srcMax) + dstMin) * dstMax;
+      }
+
       function drawImage(target, values) {
         jQuery.ajax({
           url: "/img",
@@ -51,17 +65,58 @@
           contentType: "application/json",
           dataType: "json",
           success: function (data) {
+            console.log('Success! Rendering', data.result);
             var canvas = document.getElementById(target);
             var ctx = canvas.getContext('2d');
+            console.log(ctx);
+            var imageData = ctx.createImageData(64, 64);
+            console.log(imageData);
 
-            // get current raster data
-            var imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-            var data = imageData.data;
+            var domain = range(data.result);
+            console.log(domain);
 
-            // prepare data
-            for(var i = 0; i < data.length; i++) {
-              data[i] = Math.random() * 255;
+            // Caution: this can make your eyes bleed
+            const ALPHA_CHANNEL = 3
+            const RGBA_CHANNELS = 4
+            const INPUT_HEIGHT = 8;
+            const INPUT_WIDTH = 8;
+            const OUTPUT_HEIGHT = 64;
+            const OUTPUT_WIDTH = 64;
+            const OUTPUT_SCALE = 8;
+            for (var h = 0; h < INPUT_HEIGHT; h++) {
+              for (var w = 0; w < INPUT_WIDTH; w++) {
+                for (var c = 0; c < RGBA_CHANNELS; c++) {
+                  var input_index = c * (INPUT_HEIGHT * INPUT_WIDTH) + h * INPUT_WIDTH + w;
+                  console.log(input_index);
+                  for (var i = 0; i < OUTPUT_SCALE; i++) {
+                    if (c === ALPHA_CHANNEL) {
+                      var new_w = parseInt(rescale(0, 8, 0, 64, w));
+                      var new_h = parseInt(rescale(0, 8, 0, 64, h));
+                      var output_index = (new_h + i) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + i) * RGBA_CHANNELS + c;
+                      console.log(output_index);
+                      // Alpha channel
+                      imageData.data[output_index] = 255;
+                    } else {
+                      //imageData.data[output_index] = Math.random() * 255;
+                      imageData.data[output_index] = 0;
+
+                      // imageData.data[input_index] = rescale(
+                      //   data.result[c * (8 * 8) + h * 8 + w],
+                      //   domain.min,
+                      //   domain.max,
+                      //   0,
+                      //   255,
+                      // );
+                    }
+                  }
+                }
+              }
             }
+            // for(var i = 0; i < imageData.data.length; i++) {
+            //   imageData.data[i] = Math.random() * 255;
+            // }
+
+            console.log(imageData);
 
             // draw newly modified pixels back onto the canvas
             ctx.putImageData(imageData, 0, 0);

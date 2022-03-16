@@ -33,11 +33,6 @@ let connection: Connection;
 let payer: Keypair;
 
 /*
- * For deriving the public key of an account for the program to write to
- */
-const SEED = 'hello';
-
-/*
  * Implements the expected payloads struct to request a lift to the compute limit
  */
 const computeBudgetRequestStruct = struct([
@@ -146,7 +141,7 @@ async function createAccount(programId: PublicKey): Promise<PublicKey> {
 /**
  * Execute Onnx Program
  */
-export async function executeOnnx(inputVector: Array<number>): Promise<void> {
+export async function executeOnnx(inputVector: Array<number>): Promise<PublicKey> {
   const keypair = Uint8Array.from(JSON.parse(rawKeypair || ''))
   const programKeypair = await Keypair.fromSecretKey(keypair)
 	const programAccountPubkey = await createAccount(programKeypair.publicKey);
@@ -189,22 +184,17 @@ export async function executeOnnx(inputVector: Array<number>): Promise<void> {
     new Transaction().add(allocate).add(instruction),
     [payer],
   );
+
+  return programAccountPubkey;
 }
 
 /**
  * Report the number of times the greeted account has been said hello to
  */
-// export async function reportGreetings(): Promise<void> {
-//   const accountInfo = await connection.getAccountInfo(greetedPubkey);
-//   if (accountInfo === null) {
-//     throw 'Error: cannot find the greeted account';
-//   }
-//   const greeting = GreetingsSchema.decode(accountInfo.data);
-//
-//   console.log(
-//     greetedPubkey.toBase58(),
-//     'has been greeted',
-//     greeting.counter,
-//     'time(s)',
-//   );
-// }
+export async function report(programAccountPubkey: PublicKey): Promise<Array<number>> {
+  const accountInfo = await connection.getAccountInfo(programAccountPubkey);
+  if (accountInfo === null) {
+    throw 'Error: cannot find the greeted account';
+  }
+  return dcganResultStruct.decode(accountInfo.data);
+}

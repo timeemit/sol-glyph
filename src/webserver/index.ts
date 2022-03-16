@@ -6,7 +6,7 @@ import {
     establishConnection,
     establishPayer,
     executeOnnx,
-    // reportGreetings,
+    report,
 } from './solana';
 
 
@@ -25,15 +25,13 @@ app.post('/img', async (req, res) => {
 
   // Determine who pays for the fees
   await establishPayer();
-  console.log(req.body);
 
   // Say hello to an account
-  await executeOnnx(req.body.values);
+  const programAccountPubkey = await executeOnnx(req.body.values);
 
   // Find out how many times that account has been greeted
-  // await reportGreetings();
-  console.log('Success');
-  res.json({result: [1.0]})
+  const data = await report(programAccountPubkey);
+  res.json({result: data})
 });
 
 app.listen(port, () => {

@@ -18,8 +18,6 @@ app.use('/', express.static(path.resolve(__dirname, 'dist')));
 app.use(express.json());
 
 app.post('/img', async (req, res) => {
-  console.log("Let's say hello to a Solana account...");
-
   // Establish connection to the cluster
   await establishConnection();
 

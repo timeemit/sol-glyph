@@ -30,7 +30,7 @@ let connection: Connection;
 /**
  * Keypair associated to the fees' payer
  */
-let payer: Keypair;
+const payer: Keypair = Keypair.generate();
 
 /*
  * RPC url is read from an environment variable
@@ -73,17 +73,12 @@ export async function establishConnection(): Promise<void> {
  * Establish an account to pay for everything
  */
 export async function establishPayer(): Promise<void> {
-  let fees = 0;
-  if (!payer) {
-    const {feeCalculator} = await connection.getRecentBlockhash();
-
-    // Calculate the cost of sending transactions
-    fees += feeCalculator.lamportsPerSignature * 100; // wag
-
-    payer = await getPayer();
-  }
+  const {feeCalculator} = await connection.getRecentBlockhash();
 
   let lamports = await connection.getBalance(payer.publicKey);
+
+  // Calculate the cost of sending transactions
+  const fees = feeCalculator.lamportsPerSignature * 100; // wag
   if (lamports < fees) {
     // If current balance is not enough to pay for fees, request an airdrop
     const sig = await connection.requestAirdrop(

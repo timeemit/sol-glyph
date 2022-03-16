@@ -75,15 +75,11 @@
           contentType: "application/json",
           dataType: "json",
           success: function (data) {
-            console.log('Success! Rendering', data.result);
             var canvas = document.getElementById(target);
             var ctx = canvas.getContext('2d');
-            console.log(ctx);
             var imageData = ctx.createImageData(64, 64);
-            console.log(imageData);
 
             var domain = range(data.result);
-            console.log(domain);
 
             // Caution: this can make your eyes bleed
             const ALPHA_CHANNEL = 3
@@ -97,23 +93,11 @@
               for (var w = 0; w < INPUT_WIDTH; w++) {
                 for (var c = 0; c < RGBA_CHANNELS; c++) {
                   var input_index = c * (INPUT_HEIGHT * INPUT_WIDTH) + h * INPUT_WIDTH + w;
-                  if (c !== ALPHA_CHANNEL) {
-                    console.log(input_index);
-                    console.log(data.result[input_index]);
-                    console.log(rescale(
-                      data.result[input_index],
-                      domain.min,
-                      domain.max,
-                      0,
-                      255,
-                    ));
-                  }
                   for (var ix = 0; ix < OUTPUT_SCALE; ix++) {
                     for (var iy = 0; iy < OUTPUT_SCALE; iy++) {
                       var new_w = parseInt(rescale(w, 0, 8, 0, 64));
                       var new_h = parseInt(rescale(h, 0, 8, 0, 64));
                       var output_index = (new_h + iy) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + ix) * RGBA_CHANNELS + c;
-                      // console.log(output_index);
                       if (c === ALPHA_CHANNEL) {
                         // Alpha channel
                         imageData.data[output_index] = 255;
@@ -136,8 +120,6 @@
             // for(var i = 0; i < imageData.data.length; i++) {
             //   imageData.data[i] = Math.random() * 255;
             // }
-
-            console.log(imageData);
 
             // draw newly modified pixels back onto the canvas
             ctx.putImageData(imageData, 0, 0);

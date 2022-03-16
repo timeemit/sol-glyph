@@ -39,7 +39,7 @@
       <div class="basis-3/5">Images "Between" A &amp; B</div>
       <div class="basis-1/5">A Randomly Generated Image (B)</div>
     </div>
-    <h2 class="text-xl text-center">You're Looking at Images Generated<br />Entirely on a Solana Blockchain<br />Using a Trained Machine Learning Model</h2>
+    <h2 class="text-xl text-center">Images Generated on the <br />First Deep Learning Smart Contract<br /></h2>
     <script>
       // Standard Normal variate using Box-Muller transform.
       function randn() {
@@ -127,9 +127,27 @@
         });
       }
 
+      function interpolate(left, right) {
+        var length = Math.min(left.length, right.length)
+        console.log(length);
+        var middle = Array(length);
+        for (var i = 0; i < length; i++) {
+          middle[i] = (left[i] + right[i]) / 2
+        }
+        return middle;
+      }
+
       function drawImages() {
-        drawImage("left", randArray(10));
-        drawImage("right", randArray(10));
+        const left = randArray(10);
+        const right = randArray(10);
+        const center = interpolate(left, right);
+        const centerLeft = interpolate(left, center);
+        const centerRight = interpolate(center, right);
+        drawImage("left", left);
+        drawImage("right", right);
+        drawImage("center", center);
+        drawImage("center-left", centerLeft);
+        drawImage("center-right", centerRight);
       }
 
       $.when($.ready).then(drawImages);

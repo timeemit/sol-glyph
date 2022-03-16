@@ -33,6 +33,12 @@ let connection: Connection;
 let payer: Keypair;
 
 /*
+ * RPC url is read from an environment variable
+ */
+const rpcUrl = await getRpcUrl();
+
+
+/*
  * Implements the expected payloads struct to request a lift to the compute limit
  */
 const computeBudgetRequestStruct = struct([
@@ -57,7 +63,6 @@ const dcganResultStruct = seq(f32(), 192);
  * Establish a connection to the cluster
  */
 export async function establishConnection(): Promise<void> {
-  const rpcUrl = await getRpcUrl();
   connection = new Connection(rpcUrl, 'confirmed');
   const version = await connection.getVersion();
   console.log('Connection to cluster established:', rpcUrl, version);

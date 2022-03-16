@@ -11,19 +11,29 @@
 		<h1 class="text-3xl text-center">Sol Glyph</h1>
     <div class="flex flex-row flex-wrap text-center">
       <div class="basis-1/5">
-        <canvas id="left" class="mx-auto w-16 h-16"></canvas>
+        <div class="mx-auto w-16 h-16">
+          <canvas id="left"></canvas>
+        </div>
       </div>
       <div class="basis-1/5">
-        <canvas id="center-left" class="mx-auto w-16 h-16"></canvas>
+        <div class="mx-auto w-16 h-16">
+          <canvas id="center-left"></canvas>
+        </div>
       </div>
       <div class="basis-1/5">
-        <canvas id="center" class="mx-auto w-16 h-16"></canvas>
+        <div class="mx-auto w-16 h-16">
+          <canvas id="center"></canvas>
+        </div>
       </div>
       <div class="basis-1/5">
-        <canvas id="center-right" class="mx-auto w-16 h-16"></canvas>
+        <div class="mx-auto w-16 h-16">
+            <canvas id="center-right"></canvas>
+        </div>
       </div>
       <div class="basis-1/5">
-        <canvas id="right" class="mx-auto w-16 h-16"></canvas>
+        <div class="mx-auto w-16 h-16">
+          <canvas id="right"></canvas>
+        </div>
       </div>
       <div class="basis-1/5">A Randomly Generated Image (A)</div>
       <div class="basis-3/5">Images "Between" A &amp; B</div>
@@ -53,7 +63,7 @@
         return {min, max};
       }
 
-      function rescale(srcMin, srcMax, dstMin, dstMax, val) {
+      function rescale(val, srcMin, srcMax, dstMin, dstMax) {
         return (((val - srcMin) / srcMax) + dstMin) * dstMax;
       }
 
@@ -87,26 +97,37 @@
               for (var w = 0; w < INPUT_WIDTH; w++) {
                 for (var c = 0; c < RGBA_CHANNELS; c++) {
                   var input_index = c * (INPUT_HEIGHT * INPUT_WIDTH) + h * INPUT_WIDTH + w;
-                  console.log(input_index);
-                  for (var i = 0; i < OUTPUT_SCALE; i++) {
-                    if (c === ALPHA_CHANNEL) {
-                      var new_w = parseInt(rescale(0, 8, 0, 64, w));
-                      var new_h = parseInt(rescale(0, 8, 0, 64, h));
-                      var output_index = (new_h + i) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + i) * RGBA_CHANNELS + c;
-                      console.log(output_index);
-                      // Alpha channel
-                      imageData.data[output_index] = 255;
-                    } else {
-                      //imageData.data[output_index] = Math.random() * 255;
-                      imageData.data[output_index] = 0;
-
-                      // imageData.data[input_index] = rescale(
-                      //   data.result[c * (8 * 8) + h * 8 + w],
-                      //   domain.min,
-                      //   domain.max,
-                      //   0,
-                      //   255,
-                      // );
+                  if (c !== ALPHA_CHANNEL) {
+                    console.log(input_index);
+                    console.log(data.result[input_index]);
+                    console.log(rescale(
+                      data.result[input_index],
+                      domain.min,
+                      domain.max,
+                      0,
+                      255,
+                    ));
+                  }
+                  for (var ix = 0; ix < OUTPUT_SCALE; ix++) {
+                    for (var iy = 0; iy < OUTPUT_SCALE; iy++) {
+                      var new_w = parseInt(rescale(w, 0, 8, 0, 64));
+                      var new_h = parseInt(rescale(h, 0, 8, 0, 64));
+                      var output_index = (new_h + iy) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + ix) * RGBA_CHANNELS + c;
+                      // console.log(output_index);
+                      if (c === ALPHA_CHANNEL) {
+                        // Alpha channel
+                        imageData.data[output_index] = 255;
+                      } else {
+                        // imageData.data[output_index] = Math.random() * 255;
+                        // imageData.data[output_index] = 0;
+                        imageData.data[output_index] = rescale(
+                          data.result[input_index],
+                          domain.min,
+                          domain.max,
+                          0,
+                          255,
+                        );
+                      }
                     }
                   }
                 }

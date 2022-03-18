@@ -191,7 +191,7 @@ export async function executeOnnx(pipelineInput: PipelineInput): Promise<void> {
   if (pipelineInput.prevProgramAccountPubkey) {
     keys.push({pubkey: pipelineInput.prevProgramAccountPubkey, isSigner: false, isWritable: false});
   }
-  console.log('Executing ONNX with keys', keys.map((key) => key.pubkey.toBase58()));
+  console.debug('Executing ONNX with keys', keys.map((key) => key.pubkey.toBase58()));
 
   /*
    * Execute Onnx Program

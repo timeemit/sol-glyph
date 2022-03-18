@@ -48,7 +48,12 @@ function check() {
 # 
 # announce 'Installing Solana'
 # gssh 'curl -sSfL https://release.solana.com/v1.9.9/install | sh' 'solana --version'
-# 
+
+# announce 'Setting up Solana Testnet Validator'
+# gcloud compute scp --zone $ZONE --project solana-paint ./provisioning/webserver-service root@$INSTANCE:/etc/systemd/system/solana-test-validator.service
+# gssh 'sudo systemctl enable solana-test-validator'
+# gssh 'sudo systemctl start solana-test-validator'
+
 # announce 'Downloading Glow repository'
 # gssh 'git clone https://github.com/pytorch/glow.git && cd glow && git submodule update --init --recursive'
 # 

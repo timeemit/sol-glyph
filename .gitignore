@@ -1,5 +1,5 @@
 *.js
-*.png
+[^/]*.png
 *.onnx
 github.pat
 node_modules

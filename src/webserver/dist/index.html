@@ -14,28 +14,28 @@
       <div class="basis-3/5">Deep Fakes<br />Blending<br />(A) &#9664;&mdash;&#9658; (B)</div>
       <div class="basis-1/5">Deep Fake<br />(B)</div>
       <div class="basis-1/5">
-        <div class="mx-auto w-16 h-16">
-          <canvas id="left"></canvas>
+        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+          <canvas class="absolute -top-1 -left-1" id="left"></canvas>
         </div>
       </div>
       <div class="basis-1/5">
-        <div class="mx-auto w-16 h-16">
-          <canvas id="center-left"></canvas>
+        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+          <canvas class="absolute -top-1 -left-1" id="center-left"></canvas>
         </div>
       </div>
       <div class="basis-1/5">
-        <div class="mx-auto w-16 h-16">
-          <canvas id="center"></canvas>
+        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+          <canvas class="absolute -top-1 -left-1" id="center"></canvas>
         </div>
       </div>
       <div class="basis-1/5">
-        <div class="mx-auto w-16 h-16">
-            <canvas id="center-right"></canvas>
+        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+            <canvas class="absolute -top-1 -left-1" id="center-right"></canvas>
         </div>
       </div>
       <div class="basis-1/5">
-        <div class="mx-auto w-16 h-16">
-          <canvas id="right"></canvas>
+        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+          <canvas class="absolute -top-1 -left-1" id="right"></canvas>
         </div>
       </div>
     </div>
@@ -128,10 +128,8 @@
             }
           }
         }
-        // for(var i = 0; i < imageData.data.length; i++) {
-        //   imageData.data[i] = Math.random() * 255;
-        // }
 
+        canvas.parentElement.classList.remove("animate-pulse");
         // draw newly modified pixels back onto the canvas
         ctx.putImageData(imageData, 0, 0);
       }

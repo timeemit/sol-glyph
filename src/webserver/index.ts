@@ -32,5 +32,5 @@ const listen = () => {
 // Replenish funds ad-infinitum
 setInterval(requestAirdrop, 60000);
 
-// Establish connection and account to the cluster before setting up server
-const connection = establishConnection().then(establishPayer).then(listen);
+// Establish connection, account, and funds to the cluster before setting up server
+const connection = establishConnection().then(establishPayer).then(requestAirdrop).then(listen);

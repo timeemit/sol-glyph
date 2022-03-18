@@ -2,14 +2,17 @@
 <html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Sol Glyph</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
-  <body>
-		<h1 class="text-3xl text-center">Sol Glyph</h1>
-    <div class="flex flex-row flex-wrap text-center">
+  <body class="dark:bg-[#2B2A28] dark:text-white overflow-x-clip">
+    <img class="max-h-32 mx-auto" src="/assets/solglyphLogo.png" alt="Sol Glyph Logo" />
+    <h2 class="text-xl text-center">The First<br />Deep Learning<br />Smart Contract</h2>
+    <div class="flex flex-row flex-wrap items-center text-center dark:bg-zinc-700 dark:text-zinc-300 m-10 p-10 rounded-2xl">
+      <div class="basis-1/5">Deep Fake<br />(A)</div>
+      <div class="basis-3/5">Deep Fakes<br />Blending<br />(A) &#9664;&mdash;&#9658; (B)</div>
+      <div class="basis-1/5">Deep Fake<br />(B)</div>
       <div class="basis-1/5">
         <div class="mx-auto w-16 h-16">
           <canvas id="left"></canvas>
@@ -35,11 +38,9 @@
           <canvas id="right"></canvas>
         </div>
       </div>
-      <div class="basis-1/5">A Randomly Generated Image (A)</div>
-      <div class="basis-3/5">Images "Between" A &amp; B</div>
-      <div class="basis-1/5">A Randomly Generated Image (B)</div>
     </div>
-    <h2 class="text-xl text-center">Images Generated on the <br />First Deep Learning Smart Contract<br /></h2>
+    <h2 class="text-xl text-center">Powered by</h2>
+    <img class="p-20 max-w-full" alt="Solana Logo" src="/assets/solanaLogo.png">
     <script>
       // Standard Normal variate using Box-Muller transform.
       function randn() {
@@ -68,62 +69,69 @@
       }
 
       function drawImage(target, values) {
-        jQuery.ajax({
-          url: "/img",
-          type: "POST",
-          data: JSON.stringify({ values: values }),
-          contentType: "application/json",
-          dataType: "json",
-          success: function (data) {
-            var canvas = document.getElementById(target);
-            var ctx = canvas.getContext('2d');
-            var imageData = ctx.createImageData(64, 64);
+        return new Promise((resolve, reject) => {
+          jQuery.ajax({
+            url: "/img",
+            type: "POST",
+            data: JSON.stringify({ values: values }),
+            contentType: "application/json",
+            dataType: "json",
+            success: function (data) {
+              var canvas = document.getElementById(target);
+              var ctx = canvas.getContext('2d');
+              var imageData = ctx.createImageData(64, 64);
 
-            var domain = range(data.result);
+              var domain = range(data.result);
 
-            // Caution: this can make your eyes bleed
-            const ALPHA_CHANNEL = 3
-            const RGBA_CHANNELS = 4
-            const INPUT_HEIGHT = 8;
-            const INPUT_WIDTH = 8;
-            const OUTPUT_HEIGHT = 64;
-            const OUTPUT_WIDTH = 64;
-            const OUTPUT_SCALE = 8;
-            for (var h = 0; h < INPUT_HEIGHT; h++) {
-              for (var w = 0; w < INPUT_WIDTH; w++) {
-                for (var c = 0; c < RGBA_CHANNELS; c++) {
-                  var input_index = c * (INPUT_HEIGHT * INPUT_WIDTH) + h * INPUT_WIDTH + w;
-                  for (var ix = 0; ix < OUTPUT_SCALE; ix++) {
-                    for (var iy = 0; iy < OUTPUT_SCALE; iy++) {
-                      var new_w = parseInt(rescale(w, 0, 8, 0, 64));
-                      var new_h = parseInt(rescale(h, 0, 8, 0, 64));
-                      var output_index = (new_h + iy) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + ix) * RGBA_CHANNELS + c;
-                      if (c === ALPHA_CHANNEL) {
-                        // Alpha channel
-                        imageData.data[output_index] = 255;
-                      } else {
-                        // imageData.data[output_index] = Math.random() * 255;
-                        // imageData.data[output_index] = 0;
-                        imageData.data[output_index] = rescale(
-                          data.result[input_index],
-                          domain.min,
-                          domain.max,
-                          0,
-                          255,
-                        );
+              // Caution: this can make your eyes bleed
+              const ALPHA_CHANNEL = 3
+              const RGBA_CHANNELS = 4
+              const INPUT_HEIGHT = 16;
+              const INPUT_WIDTH = 16;
+              const OUTPUT_HEIGHT = 64;
+              const OUTPUT_WIDTH = 64;
+              const OUTPUT_SCALE = 4;
+              const GRAYSCALE = true;
+              for (var h = 0; h < INPUT_HEIGHT; h++) {
+                for (var w = 0; w < INPUT_WIDTH; w++) {
+                  for (var c = 0; c < RGBA_CHANNELS; c++) {
+                    var input_index = h * INPUT_WIDTH + w;
+                    if (!GRAYSCALE) {
+                      input_index += c * (INPUT_HEIGHT * INPUT_WIDTH);
+                    }
+                    for (var ix = 0; ix < OUTPUT_SCALE; ix++) {
+                      for (var iy = 0; iy < OUTPUT_SCALE; iy++) {
+                        var new_w = parseInt(rescale(w, 0, INPUT_WIDTH, 0, OUTPUT_WIDTH));
+                        var new_h = parseInt(rescale(h, 0, INPUT_HEIGHT, 0, OUTPUT_HEIGHT));
+                        var output_index = (new_h + iy) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + ix) * RGBA_CHANNELS + c;
+                        if (c === ALPHA_CHANNEL) {
+                          // Alpha channel
+                          imageData.data[output_index] = 255;
+                        } else {
+                          // imageData.data[output_index] = Math.random() * 255;
+                          // imageData.data[output_index] = 0;
+                          imageData.data[output_index] = rescale(
+                            data.result[input_index],
+                            domain.min,
+                            domain.max,
+                            0,
+                            255,
+                          );
+                        }
                       }
                     }
                   }
                 }
               }
-            }
-            // for(var i = 0; i < imageData.data.length; i++) {
-            //   imageData.data[i] = Math.random() * 255;
-            // }
+              // for(var i = 0; i < imageData.data.length; i++) {
+              //   imageData.data[i] = Math.random() * 255;
+              // }
 
-            // draw newly modified pixels back onto the canvas
-            ctx.putImageData(imageData, 0, 0);
-          },
+              // draw newly modified pixels back onto the canvas
+              ctx.putImageData(imageData, 0, 0);
+              resolve();
+            },
+          });
         });
       }
 
@@ -143,11 +151,13 @@
         const center = interpolate(left, right);
         const centerLeft = interpolate(left, center);
         const centerRight = interpolate(center, right);
-        drawImage("left", left);
-        drawImage("right", right);
-        drawImage("center", center);
-        drawImage("center-left", centerLeft);
-        drawImage("center-right", centerRight);
+        Promise.all([
+          drawImage("left", left),
+          drawImage("right", right),
+          drawImage("center", center),
+          drawImage("center-left", centerLeft),
+          drawImage("center-right", centerRight),
+        ]).then((results) => setTimeout(drawImages, 10000));
       }
 
       $.when($.ready).then(drawImages);

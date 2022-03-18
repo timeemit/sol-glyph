@@ -65,7 +65,6 @@ const static uint8_t constantWeight[DCGAN_TRAINED_STATIC_CONSTANT_MEM_SIZE] = {
 
 #define INPUT_LENGTH_ 10
 #define OUTPUT_LENGTH_ 192
-static const int IMG_SIZE = 8;
 static const char *INPUT_VAR = "A0";
 static const char *OUTPUT_VAR = "A12";
 
@@ -125,6 +124,7 @@ uint8_t *allocateMutableWeightVars(struct BumpAllocator *heap, const BundleConfi
 }
 
 float *getInferenceResults(const BundleConfig *config, uint8_t *mutableWeightVars) {
+  sol_log(OUTPUT_VAR);
   const SymbolTableEntry *outputWeights = getMutableWeightVar(config, OUTPUT_VAR);
   float *results = (float *)(mutableWeightVars + outputWeights->offset);
   return results;
@@ -148,13 +148,14 @@ uint8_t *initActivations(struct BumpAllocator *heap, BundleConfig *config) {
 }
 
 uint64_t exec_onnx(SolParameters *params) {
+  float data[INPUT_LENGTH_];
 
   if (params->ka_num < 1) {
     sol_log("Program account not included in the instruction");
     return ERROR_NOT_ENOUGH_ACCOUNT_KEYS;
   }
 
-  // Get the account to say hello to
+  // Get the invoking account
   SolAccountInfo *program_account = &params->ka[0];
 
   // The account must be owned by the program in order to modify its data
@@ -171,14 +172,36 @@ uint64_t exec_onnx(SolParameters *params) {
     return ERROR_ACCOUNT_DATA_TOO_SMALL;
   }
 
-  // Verify the input
-  if (params->data_len != sizeof(float) * INPUT_LENGTH_) {
-    sol_log("Program parameters is not precisely INPUT_LENGTH_ floats");
-    return ERROR_INVALID_INSTRUCTION_DATA;
+  // Verify the input and point to data
+  if (params->data_len == 0) {
+    sol_log("No params passed in.  Looking for data in a previous account");
+    if (params->ka_num < 2) {
+      sol_log("A second program account is not present when no params were sent");
+      return ERROR_NOT_ENOUGH_ACCOUNT_KEYS;
+    }
+    // Get the account holding the results of the previous account
+    SolAccountInfo *previous_program_account = &params->ka[1];
+
+    // if (previous_program_account->data_len < sizeof(float) * INPUT_LENGTH_) {
+    //   sol_log("Program account does not have enough data to support INPUT_LENGTH_ floats");
+    //   return ERROR_ACCOUNT_DATA_TOO_SMALL;
+    // }
+
+    // Read from program account
+    sol_log("Reading data from the program account");
+    sol_memcpy(data, previous_program_account->data, sizeof(float) * INPUT_LENGTH_);
+  } else {
+    if (params->data_len != sizeof(float) * INPUT_LENGTH_) {
+      sol_log("Program parameters is not precisely INPUT_LENGTH_ floats");
+      return ERROR_INVALID_INSTRUCTION_DATA;
+    }
+    // Read from params
+    sol_log("Reading data from params");
+    sol_memcpy(data, params->data, sizeof(float) * INPUT_LENGTH_);
   }
-  
+
   struct BumpAllocator heap = {HEAP_START_ADDRESS_, HEAP_LENGTH_};
-  uint8_t *mutableWeightVarsAddr = initMutableWeightVars(&heap, &DCGAN_trained_dynamic_config, (float *)params->data);
+  uint8_t *mutableWeightVarsAddr = initMutableWeightVars(&heap, &DCGAN_trained_dynamic_config, data);
   sol_log("Initiated Mutable Weights");
 
   uint8_t *activationsAddr = initActivations(&heap, &DCGAN_trained_dynamic_config);
@@ -202,7 +225,7 @@ uint64_t exec_onnx(SolParameters *params) {
 extern uint64_t entrypoint(const uint8_t *input) {
   sol_log("DCGAN C program entrypoint");
 
-  SolAccountInfo accounts[1];
+  SolAccountInfo accounts[2];
   SolParameters params = (SolParameters){.ka = accounts};
 
   if (!sol_deserialize(input, &params, SOL_ARRAY_SIZE(accounts))) {

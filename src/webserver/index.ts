@@ -5,7 +5,7 @@ import {fileURLToPath} from 'url';
 import {
     establishConnection,
     establishPayer,
-    executeOnnx,
+    executeOnnxPipeline,
     report,
 } from './solana';
 
@@ -17,19 +17,16 @@ app.use('/', express.static(path.resolve(__dirname, 'dist')));
 
 app.use(express.json());
 
-app.post('/img', async (req, res) => {
+app.post('/img', async (req, res, next) => {
   // Establish connection to the cluster
-  await establishConnection();
+  const connection = establishConnection();
 
   // Determine who pays for the fees
-  await establishPayer();
+  const payer = connection.then(() => establishPayer());
 
-  // Say hello to an account
-  const programAccountPubkey = await executeOnnx(req.body.values);
-
-  // Find out how many times that account has been greeted
-  const data = await report(programAccountPubkey);
-  res.json({result: data})
+  // Execute ONNX
+  const output = payer.then(() => executeOnnxPipeline(req.body.values));
+  res.json(output.catch(next));
 });
 
 app.listen(port, () => {

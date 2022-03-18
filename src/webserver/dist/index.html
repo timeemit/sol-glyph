@@ -169,11 +169,13 @@
           .all(targets.map((target, i) => getImage(target, NZs[i])))
           .then((responses) => {
             responses.map((response, i) => drawImage(targets[i], response));
-            setTimeout(drawImages, 10000)
           });
       }
 
-      $.when($.ready).then(drawImages);
+      $.when($.ready).then(() => {
+        drawImages();
+        setInterval(drawImages, 30000)
+      });
     </script>
   </body>
 </html>

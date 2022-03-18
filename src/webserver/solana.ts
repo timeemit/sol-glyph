@@ -219,28 +219,28 @@ interface PipelineInput {
 
 export async function executeOnnxPipeline(params: Array<number>): Promise<Report> {
   const programKeypairs = KEYPAIRS.map((keypair) => Keypair.fromSecretKey(Uint8Array.from(keypair)));
-  const programAccountPubkeys = await Promise.all(programKeypairs.map((keypair) => createAccount(keypair.publicKey)));
-  console.log('Program accounts created');
-  let output_promise = executeOnnx({
-    programKeypair: programKeypairs[0],
-    params,
-    programAccountPubkey: programAccountPubkeys[0],
-    prevProgramAccountPubkey: null,
-  });
-
-  KEYPAIRS.slice(1).forEach((keys, i) => {
-    output_promise = output_promise.then(pipelineInput => {
-      console.log("Executing input of model #", i + 1);
-      return executeOnnx({
-        programKeypair: programKeypairs[i + 1],
-        params: [],
-        programAccountPubkey: programAccountPubkeys[i + 1],
-        prevProgramAccountPubkey: programAccountPubkeys[i],
-      });
+  return Promise.all(programKeypairs.map((keypair) => createAccount(keypair.publicKey)))
+    .then((programAccountPubkeys) => {
+      console.debug('Program accounts created');
+      let pipeline = executeOnnx({
+        programKeypair: programKeypairs[0],
+        params,
+        programAccountPubkey: programAccountPubkeys[0],
+        prevProgramAccountPubkey: null,
+      })
+      KEYPAIRS.slice(1).forEach((keys, i) => {
+        pipeline = pipeline.then(pipelineInput => {
+          console.debug("Executing input of model #", i + 1);
+          return executeOnnx({
+            programKeypair: programKeypairs[i + 1],
+            params: [],
+            programAccountPubkey: programAccountPubkeys[i + 1],
+            prevProgramAccountPubkey: programAccountPubkeys[i],
+          });
+        });
+      })
+      return pipeline.then(() => report(programAccountPubkeys[programAccountPubkeys.length - 1]));
     });
-  });
-
-  return output_promise.then(() => report(programAccountPubkeys[programAccountPubkeys.length - 1]));;
 }
 
 interface Report {

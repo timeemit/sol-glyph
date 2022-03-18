@@ -71,13 +71,19 @@ export async function establishConnection(): Promise<void> {
   let fallbackRpcUrl = rpcUrl || await getRpcUrl();
   connection = new Connection(fallbackRpcUrl, 'confirmed');
   const version = await connection.getVersion();
-  console.log('Connection to cluster established:', rpcUrl, version);
+  console.log('Connection to Solana cluster established:', rpcUrl, version);
 }
 
 /**
  * Establish an account to pay for everything
  */
 export async function establishPayer(): Promise<void> {
+  if (!payer) {
+    payer = Keypair.generate()
+  }
+}
+
+export async function requestAirdrop(): Promise<void> {
   // Calculate the cost of sending transactions
   const {feeCalculator} = await connection.getRecentBlockhash();
   const max_size = getMaxAccountSize();
@@ -86,40 +92,40 @@ export async function establishPayer(): Promise<void> {
   );
   fees += feeCalculator.lamportsPerSignature * 100; // wag
 
-  if (!payer) {
-    payer = Keypair.generate()
-
-    // If current balance is not enough to pay for fees, request an airdrop
-    const sig = await connection.requestAirdrop(
-      payer.publicKey,
-      1000 * fees,
-    );
-    console.log('Requesting', 1000 * fees, 'in airdrop to', payer.publicKey.toBase58(), 'in transaction', sig);
-    await connection.confirmTransaction(sig);
-  }
+  const sig = await connection.requestAirdrop(
+    payer.publicKey,
+    1000 * fees,
+  );
+  console.debug('Requesting', 1000 * fees, 'in airdrop to', payer.publicKey.toBase58(), 'in transaction', sig);
+  await connection.confirmTransaction(sig);
 
   const lamports = await connection.getBalance(payer.publicKey);
-  console.log(
+  console.debug(
     'Using account',
     payer.publicKey.toBase58(),
     'containing',
     lamports / LAMPORTS_PER_SOL,
     'SOL to pay for fees',
   );
+
 }
 
 async function createAccount(programId: PublicKey): Promise<PublicKey> {
   const seed = uuidv4().slice(0, 8);
-  const programAccountPubkey = await PublicKey.createWithSeed(
-    payer.publicKey,
-    seed,
-    programId,
-  );
+  const space = getDcganResultStruct(getMaxAccountSize()).span;
+  let pipeline = Promise.all([
+    PublicKey.createWithSeed(
+      payer.publicKey,
+      seed,
+      programId,
+    ),
+    connection.getMinimumBalanceForRentExemption(space),
+  ]);
+  return pipeline.then(responses => {
+    const programAccountPubkey = responses[0];
+    const lamports = responses[1]
 
-  const createdAccount = await connection.getAccountInfo(programAccountPubkey);
-  if (createdAccount === null) {
-    const space = getDcganResultStruct(getMaxAccountSize()).span;
-    console.log(
+    console.debug(
       'Creating account',
       programAccountPubkey.toBase58(),
       'to persist',

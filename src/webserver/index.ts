@@ -7,6 +7,7 @@ import {
     establishPayer,
     executeOnnxPipeline,
     report,
+    requestAirdrop,
 } from './solana';
 
 
@@ -18,12 +19,8 @@ app.use('/', express.static(path.resolve(__dirname, 'dist')));
 app.use(express.json());
 
 app.post('/img', async (req, res, next) => {
-  // Determine who pays for the fees
-  const payer = connection.then(() => establishPayer());
-
   // Execute ONNX
-  const output = payer.then(() => executeOnnxPipeline(req.body.values));
-  output.then(result => res.json(result)).catch(next);
+  executeOnnxPipeline(req.body.values).then(result => res.json(result)).catch(next);
 });
 
 const listen = () => {
@@ -32,5 +29,8 @@ const listen = () => {
   });
 }
 
+// Replenish funds ad-infinitum
+setInterval(requestAirdrop, 60000);
+
 // Establish connection and account to the cluster before setting up server
-const connection = establishConnection().then(listen);
+const connection = establishConnection().then(establishPayer).then(listen);

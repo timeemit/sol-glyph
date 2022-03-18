@@ -107,11 +107,11 @@ do
   announce "Compiling a layer $i trained model"
 
   gssh "rm -rf $DIR/DCGAN-trained-{static,dynamic} && mkdir -p $DIR"
-  # Grab the image
-  # gcloud compute scp --zone us-central1-c --project solana-paint trainer-2:~/tutorials/$ONNX ./$ONNX
+  # Grab the onnx model
+  gcloud compute scp --zone us-central1-c --project solana-paint trainer-2:~/tutorials/$ONNX ./$ONNX
 
-  # Upload the image
-  # gcloud compute scp --zone $ZONE --project solana-paint ./$ONNX $INSTANCE:./$ONNX
+  # Upload the onnx model
+  gcloud compute scp --zone $ZONE --project solana-paint ./$ONNX $INSTANCE:./$ONNX
   gcloud compute scp --zone $ZONE --project solana-paint ./src/compiler/DCGAN.c $INSTANCE:$DIR/DCGAN.c
   gssh "./build_Release/bin/model-compiler -backend=CPU -model=/home/liam/$ONNX -emit-bundle=$DIR/DCGAN-trained-static/ -network-name=DCGAN-trained-static-$i -target=bpfel -mcpu=generic -relocation-model=pic -bundle-api=static"
   gssh "./build_Release/bin/model-compiler -backend=CPU -model=/home/liam/$ONNX -emit-bundle=$DIR/DCGAN-trained-dynamic/ -network-name=DCGAN-trained-dynamic-$i -target=bpfel -mcpu=generic -relocation-model=pic -bundle-api=dynamic"

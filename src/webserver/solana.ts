@@ -61,7 +61,7 @@ function getDcganResultStruct(size: number): typeof seq {
 }
 
 function getMaxAccountSize(): number {
-  return 768;
+  return 256;  // Models 3 - 7 output 256 bytes of floats
 }
 
 /**

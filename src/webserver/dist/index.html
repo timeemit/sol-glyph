@@ -6,41 +6,43 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   </head>
-  <body class="dark:bg-[#2B2A28] dark:text-white overflow-x-clip">
-    <img class="max-h-32 mx-auto" src="/assets/solglyphLogo.png" alt="Sol Glyph Logo" />
-    <h2 class="text-xl text-center">The First<br />Deep Learning<br />Smart Contract</h2>
-    <div class="flex flex-row flex-wrap items-center gap-y-6 text-center dark:bg-zinc-700 dark:text-zinc-300 m-10 p-10 rounded-2xl">
-      <div class="basis-1/5">Deep Fake<br />(A)</div>
-      <div class="basis-3/5">Deep Fakes<br />Blending<br />(A) &#9664;&mdash;&#9658; (B)</div>
-      <div class="basis-1/5">Deep Fake<br />(B)</div>
-      <div class="basis-1/5">
-        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
-          <canvas class="absolute -top-1 -left-1" id="left"></canvas>
+  <body>
+    <div class="dark:bg-[#2B2A28] dark:text-white overflow-x-clip">
+      <img class="max-h-32 mx-auto" src="/assets/solglyphLogo.png" alt="Sol Glyph Logo" />
+      <h2 class="text-xl text-center">The First<br />Deep Learning<br />Smart Contract</h2>
+      <div class="flex flex-row flex-wrap items-center gap-y-6 text-center dark:bg-zinc-700 dark:text-zinc-300 m-10 p-10 rounded-2xl">
+        <div class="basis-1/5">Deep Fake<br />(A)</div>
+        <div class="basis-3/5">Deep Fakes<br />Blending<br />(A) &#9664;&mdash;&#9658; (B)</div>
+        <div class="basis-1/5">Deep Fake<br />(B)</div>
+        <div class="basis-1/5">
+          <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+            <canvas class="absolute -top-1 -left-1" id="left"></canvas>
+          </div>
+        </div>
+        <div class="basis-1/5">
+          <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+            <canvas class="absolute -top-1 -left-1" id="center-left"></canvas>
+          </div>
+        </div>
+        <div class="basis-1/5">
+          <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+            <canvas class="absolute -top-1 -left-1" id="center"></canvas>
+          </div>
+        </div>
+        <div class="basis-1/5">
+          <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+              <canvas class="absolute -top-1 -left-1" id="center-right"></canvas>
+          </div>
+        </div>
+        <div class="basis-1/5">
+          <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
+            <canvas class="absolute -top-1 -left-1" id="right"></canvas>
+          </div>
         </div>
       </div>
-      <div class="basis-1/5">
-        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
-          <canvas class="absolute -top-1 -left-1" id="center-left"></canvas>
-        </div>
-      </div>
-      <div class="basis-1/5">
-        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
-          <canvas class="absolute -top-1 -left-1" id="center"></canvas>
-        </div>
-      </div>
-      <div class="basis-1/5">
-        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
-            <canvas class="absolute -top-1 -left-1" id="center-right"></canvas>
-        </div>
-      </div>
-      <div class="basis-1/5">
-        <div class="relative mx-auto w-[62px] h-[62px] animate-pulse border-zinc-400 border-2">
-          <canvas class="absolute -top-1 -left-1" id="right"></canvas>
-        </div>
-      </div>
+      <h2 class="text-xl text-center">Powered by</h2>
+      <img class="p-20 max-w-full" alt="Solana Logo" src="/assets/solanaLogo.png">
     </div>
-    <h2 class="text-xl text-center">Powered by</h2>
-    <img class="p-20 max-w-full" alt="Solana Logo" src="/assets/solanaLogo.png">
     <script>
       // Standard Normal variate using Box-Muller transform.
       function randn() {

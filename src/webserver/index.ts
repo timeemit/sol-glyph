@@ -26,7 +26,7 @@ app.post('/img', async (req, res, next) => {
 
   // Execute ONNX
   const output = payer.then(() => executeOnnxPipeline(req.body.values));
-  res.json(output.catch(next));
+  output.then(result => res.json(result)).catch(next);
 });
 
 app.listen(port, () => {

@@ -99,7 +99,7 @@ OUTPUTS=(128 128 128 256 256 256 256 256)
 INPUT_VARS=(A0 input input A0 input input A0 A0)
 OUTPUT_VARS=(A2 A6 A1 A2 A6 A1 A2 A1)
 
-for i in {4..7};
+for i in {0..7};
 do
   ONNX="DCGAN-trained-16x16-full-$i.onnx"
   DIR="example-helloworld/src/program-c/src/DCGAN-$i"

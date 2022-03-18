@@ -133,8 +133,6 @@ async function createAccount(programId: PublicKey): Promise<PublicKey> {
       'bytes into',
     );
 
-    const lamports = await connection.getMinimumBalanceForRentExemption(space);
-
     const transaction = new Transaction().add(
       SystemProgram.createAccountWithSeed({
         fromPubkey: payer.publicKey,
@@ -146,10 +144,11 @@ async function createAccount(programId: PublicKey): Promise<PublicKey> {
         programId,
       }),
     );
-    await sendAndConfirmTransaction(connection, transaction, [payer]);
-  }
-
-  return programAccountPubkey;
+    
+    return new Promise((resolve, reject) => {
+      sendAndConfirmTransaction(connection, transaction, [payer]).then(() => resolve(programAccountPubkey))
+    });
+  });
 }
 
 

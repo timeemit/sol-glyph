@@ -68,7 +68,7 @@
         return (((val - srcMin) / srcMax) + dstMin) * dstMax;
       }
 
-      function drawImage(target, values) {
+      function getImage(target, values) {
         return new Promise((resolve, reject) => {
           jQuery.ajax({
             url: "/img",
@@ -76,63 +76,64 @@
             data: JSON.stringify({ values: values }),
             contentType: "application/json",
             dataType: "json",
-            success: function (data) {
-              var canvas = document.getElementById(target);
-              var ctx = canvas.getContext('2d');
-              var imageData = ctx.createImageData(64, 64);
+            success: resolve,
+          });
+        });
+      }
 
-              var domain = range(data.result);
+      function drawImage(target, data) {
+        var canvas = document.getElementById(target);
+        var ctx = canvas.getContext('2d');
+        var imageData = ctx.createImageData(64, 64);
 
-              // Caution: this can make your eyes bleed
-              const ALPHA_CHANNEL = 3
-              const RGBA_CHANNELS = 4
-              const INPUT_HEIGHT = 16;
-              const INPUT_WIDTH = 16;
-              const OUTPUT_HEIGHT = 64;
-              const OUTPUT_WIDTH = 64;
-              const OUTPUT_SCALE = 4;
-              const GRAYSCALE = true;
-              for (var h = 0; h < INPUT_HEIGHT; h++) {
-                for (var w = 0; w < INPUT_WIDTH; w++) {
-                  for (var c = 0; c < RGBA_CHANNELS; c++) {
-                    var input_index = h * INPUT_WIDTH + w;
-                    if (!GRAYSCALE) {
-                      input_index += c * (INPUT_HEIGHT * INPUT_WIDTH);
-                    }
-                    for (var ix = 0; ix < OUTPUT_SCALE; ix++) {
-                      for (var iy = 0; iy < OUTPUT_SCALE; iy++) {
-                        var new_w = parseInt(rescale(w, 0, INPUT_WIDTH, 0, OUTPUT_WIDTH));
-                        var new_h = parseInt(rescale(h, 0, INPUT_HEIGHT, 0, OUTPUT_HEIGHT));
-                        var output_index = (new_h + iy) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + ix) * RGBA_CHANNELS + c;
-                        if (c === ALPHA_CHANNEL) {
-                          // Alpha channel
-                          imageData.data[output_index] = 255;
-                        } else {
-                          // imageData.data[output_index] = Math.random() * 255;
-                          // imageData.data[output_index] = 0;
-                          imageData.data[output_index] = rescale(
-                            data.result[input_index],
-                            domain.min,
-                            domain.max,
-                            0,
-                            255,
-                          );
-                        }
-                      }
-                    }
+        var domain = range(data.result);
+
+        // Caution: this can make your eyes bleed
+        const ALPHA_CHANNEL = 3
+        const RGBA_CHANNELS = 4
+        const INPUT_HEIGHT = 16;
+        const INPUT_WIDTH = 16;
+        const OUTPUT_HEIGHT = 64;
+        const OUTPUT_WIDTH = 64;
+        const OUTPUT_SCALE = 4;
+        const GRAYSCALE = true;
+        for (var h = 0; h < INPUT_HEIGHT; h++) {
+          for (var w = 0; w < INPUT_WIDTH; w++) {
+            for (var c = 0; c < RGBA_CHANNELS; c++) {
+              var input_index = h * INPUT_WIDTH + w;
+              if (!GRAYSCALE) {
+                input_index += c * (INPUT_HEIGHT * INPUT_WIDTH);
+              }
+              for (var ix = 0; ix < OUTPUT_SCALE; ix++) {
+                for (var iy = 0; iy < OUTPUT_SCALE; iy++) {
+                  var new_w = parseInt(rescale(w, 0, INPUT_WIDTH, 0, OUTPUT_WIDTH));
+                  var new_h = parseInt(rescale(h, 0, INPUT_HEIGHT, 0, OUTPUT_HEIGHT));
+                  var output_index = (new_h + iy) * (OUTPUT_WIDTH * RGBA_CHANNELS) + (new_w + ix) * RGBA_CHANNELS + c;
+                  if (c === ALPHA_CHANNEL) {
+                    // Alpha channel
+                    imageData.data[output_index] = 255;
+                  } else {
+                    // imageData.data[output_index] = Math.random() * 255;
+                    // imageData.data[output_index] = 0;
+                    imageData.data[output_index] = rescale(
+                      data.result[input_index],
+                      domain.min,
+                      domain.max,
+                      0,
+                      255,
+                    );
                   }
                 }
               }
-              // for(var i = 0; i < imageData.data.length; i++) {
-              //   imageData.data[i] = Math.random() * 255;
-              // }
+            }
+          }
+        }
+        // for(var i = 0; i < imageData.data.length; i++) {
+        //   imageData.data[i] = Math.random() * 255;
+        // }
 
-              // draw newly modified pixels back onto the canvas
-              ctx.putImageData(imageData, 0, 0);
-              resolve();
-            },
-          });
-        });
+        // draw newly modified pixels back onto the canvas
+        ctx.putImageData(imageData, 0, 0);
       }
 
       function interpolate(left, right) {
@@ -150,13 +151,26 @@
         const center = interpolate(left, right);
         const centerLeft = interpolate(left, center);
         const centerRight = interpolate(center, right);
-        Promise.all([
-          drawImage("left", left),
-          drawImage("right", right),
-          drawImage("center", center),
-          drawImage("center-left", centerLeft),
-          drawImage("center-right", centerRight),
-        ]).then((results) => setTimeout(drawImages, 10000));
+        const targets = [
+          "left",
+          "center-left",
+          "center",
+          "center-right",
+          "right",
+        ];
+        const NZs = [
+          left,
+          centerLeft,
+          center,
+          centerRight,
+          right,
+        ];
+        Promise
+          .all(targets.map((target, i) => getImage(target, NZs[i])))
+          .then((responses) => {
+            responses.map((response, i) => drawImage(targets[i], response));
+            setTimeout(drawImages, 10000)
+          });
       }
 
       $.when($.ready).then(drawImages);

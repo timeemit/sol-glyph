@@ -18,9 +18,6 @@ app.use('/', express.static(path.resolve(__dirname, 'dist')));
 app.use(express.json());
 
 app.post('/img', async (req, res, next) => {
-  // Establish connection to the cluster
-  const connection = establishConnection();
-
   // Determine who pays for the fees
   const payer = connection.then(() => establishPayer());
 
@@ -29,6 +26,11 @@ app.post('/img', async (req, res, next) => {
   output.then(result => res.json(result)).catch(next);
 });
 
-app.listen(port, () => {
-  console.log(`Example app listening on port ${port}`)
-});
+const listen = () => {
+  app.listen(port, () => {
+    console.log(`Example app listening on port ${port}`)
+  });
+}
+
+// Establish connection and account to the cluster before setting up server
+const connection = establishConnection().then(listen);

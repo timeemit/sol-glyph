@@ -4,6 +4,7 @@ Description=SolanaValidator
 [Service]
 ExecStart=/home/liam/.local/share/solana/install/active_release/bin/solana-test-validator
 WorkingDirectory=~
+Restart=always
 
 [Install]
 WantedBy=multi-user.target

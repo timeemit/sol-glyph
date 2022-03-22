@@ -84,16 +84,6 @@ gssh 'mkdir -p build_Release && cd build_Release && cmake -G Ninja -DCMAKE_BUILD
 # announce 'Configure & Build Glow in Release Mode with Bundles'
 # gssh 'mkdir -p build_Release && cd build_Release && cmake -G Ninja -DCMAKE_BUILD_TYPE=Release -DGLOW_WITH_BUNDLES=ON ../glow && ninja all'
 
-
-announce 'Compiling a trained model generating'
-ONNX="DCGAN-trained-8x8-full-celeb.onnx"
-gssh 'rm -rf example-helloworld/src/program-c/src/DCGAN/DCGAN-trained-{static,dynamic}'
-gssh "./build_Release/bin/model-compiler -backend=CPU -model=/home/liam/$ONNX -emit-bundle=./example-helloworld/src/program-c/src/DCGAN/DCGAN-trained-static/ -network-name=DCGAN-trained-static -target=bpfel -mcpu=generic -relocation-model=pic -bundle-api=static"
-gssh "./build_Release/bin/model-compiler -backend=CPU -model=/home/liam/$ONNX -emit-bundle=./example-helloworld/src/program-c/src/DCGAN/DCGAN-trained-dynamic/ -network-name=DCGAN-trained-dynamic -target=bpfel -mcpu=generic -relocation-model=pic -bundle-api=dynamic"
-gssh "find example-helloworld/src/program-c/src/DCGAN/ -name '*.h' -type f -exec sed -i 's/#include.*//' {} \;"  # Remove directive conflicting with Solana SDK
-gssh 'V=1 make -C example-helloworld/src/program-c DCGAN && /home/liam/.local/share/solana/install/active_release/bin/sdk/bpf/c/../dependencies/bpf-tools/llvm/bin/ld.lld -z notext -shared --Bdynamic /home/liam/.local/share/solana/install/active_release/bin/sdk/bpf/c/bpf.ld --entry entrypoint -L /home/liam/.local/share/solana/install/active_release/bin/sdk/bpf/c/../dependencies/bpf-tools/llvm/lib -lc  -o example-helloworld/dist/program/DCGAN.so example-helloworld/src/program-c/src/DCGAN/DCGAN-trained-dynamic/DCGAN_trained_dynamic.o example-helloworld/dist/program/DCGAN/DCGAN.o /home/liam/.local/share/solana/install/active_release/bin/sdk/bpf/c/../dependencies/bpf-tools/rust/lib/rustlib/bpfel-unknown-unknown/lib/libcompiler_builtins-*.rlib'
-gssh "solana program deploy /home/liam/example-helloworld/dist/program/DCGAN.so"
-
 INPUTS=(10 128 128 128 256 256 256 256)
 OUTPUTS=(128 128 128 256 256 256 256 256)
 INPUT_VARS=(A0 input input A0 input input A0 A0)

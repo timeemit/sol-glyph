@@ -14,6 +14,18 @@ import {
 const app = express();
 const port = process.env.PORT || 3000;
 
+app.use((req, res, next) => {
+  if (req.hostname.includes("demo")) {
+    console.log("Demo URL hit");
+    const url = process.env.DEMO_URL;
+    if (url) {
+      return res.redirect(url);
+    }
+    console.log("Demo URL unsupported");
+  }
+  next();
+});
+
 app.use((req, res, next)  =>{
   // Require HTTPS.  The 'x-forwarded-proto' check is for Heroku
   if (!req.secure && req.get('x-forwarded-proto') !== 'https' && process.env.NODE_ENV !== "development") {

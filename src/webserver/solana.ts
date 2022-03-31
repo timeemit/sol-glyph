@@ -84,30 +84,34 @@ export async function establishPayer(): Promise<void> {
 }
 
 export async function requestAirdrop(): Promise<void> {
-  // Calculate the cost of sending transactions
-  const {feeCalculator} = await connection.getRecentBlockhash();
-  const max_size = getMaxAccountSize();
-  let fees = await connection.getMinimumBalanceForRentExemption(
-    getDcganResultStruct(max_size).span,
-  );
-  fees += feeCalculator.lamportsPerSignature * 100; // wag
+  try {
+    throw new Error("Error");
+    // Calculate the cost of sending transactions
+    const {feeCalculator} = await connection.getRecentBlockhash();
+    const max_size = getMaxAccountSize();
+    let fees = await connection.getMinimumBalanceForRentExemption(
+      getDcganResultStruct(max_size).span,
+    );
+    fees += feeCalculator.lamportsPerSignature * 100; // wag
 
-  const sig = await connection.requestAirdrop(
-    payer.publicKey,
-    1000 * fees,
-  );
-  console.debug('Requesting', 1000 * fees, 'in airdrop to', payer.publicKey.toBase58(), 'in transaction', sig);
-  await connection.confirmTransaction(sig);
+    const sig = await connection.requestAirdrop(
+      payer.publicKey,
+      1000 * fees,
+    );
+    console.debug('Requesting', 1000 * fees, 'in airdrop to', payer.publicKey.toBase58(), 'in transaction', sig);
+    await connection.confirmTransaction(sig);
 
-  const lamports = await connection.getBalance(payer.publicKey);
-  console.debug(
-    'Using account',
-    payer.publicKey.toBase58(),
-    'containing',
-    lamports / LAMPORTS_PER_SOL,
-    'SOL to pay for fees',
-  );
-
+    const lamports = await connection.getBalance(payer.publicKey);
+    console.debug(
+      'Using account',
+      payer.publicKey.toBase58(),
+      'containing',
+      lamports / LAMPORTS_PER_SOL,
+      'SOL to pay for fees',
+    );
+  } catch (e) {
+    console.error('Encountered exception during requestAirdrop():', e);
+  }
 }
 
 async function createAccount(programId: PublicKey): Promise<PublicKey> {

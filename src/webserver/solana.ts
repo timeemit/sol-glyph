@@ -85,7 +85,6 @@ export async function establishPayer(): Promise<void> {
 
 export async function requestAirdrop(): Promise<void> {
   try {
-    throw new Error("Error");
     // Calculate the cost of sending transactions
     const {feeCalculator} = await connection.getRecentBlockhash();
     const max_size = getMaxAccountSize();
